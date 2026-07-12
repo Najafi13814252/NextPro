@@ -19,6 +19,8 @@ import {
   FieldLabel
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { authClient } from "@/lib/auth-client"
+import z from "zod"
 
 function SignupPage() {
   const form = useForm({
@@ -30,8 +32,12 @@ function SignupPage() {
     }
   })
 
-  function onSubmit() {
-    console.log('sss');
+  async function onSubmit(data: z.infer<typeof signupSchema>) {
+    await authClient.signUp.email({
+      email: data.email,
+      name: data.name,
+      password: data.password
+    })
   }
   return (
     <Card>
