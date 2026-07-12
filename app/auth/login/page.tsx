@@ -1,6 +1,6 @@
 'use client'
 
-import { signupSchema } from "@/schemas/auth"
+import { loginSchema } from "@/schemas/auth"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 
@@ -20,12 +20,11 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
-function SignupPage() {
+function LoginPage() {
   const form = useForm({
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
-      name: "",
       password: ""
     }
   })
@@ -36,24 +35,14 @@ function SignupPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sign up</CardTitle>
+        <CardTitle>Login</CardTitle>
         <CardDescription>
-          Create an account to get started
+          wellcome Back!
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup className="gap-y-6">
-            <Controller name="name" control={form.control} render={({ field, fieldState }) => (
-              <Field>
-                <FieldLabel>Full Name</FieldLabel>
-                <Input aria-invalid={fieldState.invalid} placeholder="abc" {...field} />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )} />
-
             <Controller name="email" control={form.control} render={({ field, fieldState }) => (
               <Field>
                 <FieldLabel>Email</FieldLabel>
@@ -76,7 +65,7 @@ function SignupPage() {
           </FieldGroup>
 
           <Button type="submit" className="w-full mt-6">
-            Sign up
+            Login
           </Button>
         </form>
       </CardContent>
@@ -84,4 +73,4 @@ function SignupPage() {
   )
 }
 
-export default SignupPage
+export default LoginPage

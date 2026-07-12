@@ -3,6 +3,8 @@ import { Geist, Geist_Mono, Figtree, Outfit } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
+import { ConvexClientProvider } from "@/components/web/ConvexClientProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const outfitHeading = Outfit({ subsets: ['latin'], variable: '--font-heading' });
 
@@ -42,8 +44,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <main className="max-w-7xl mx-auto w-full px-4 md:px-6 lg:px-8">
-            {children}
+            <ConvexClientProvider>{children}</ConvexClientProvider>
           </main>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
