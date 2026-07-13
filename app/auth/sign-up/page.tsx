@@ -5,24 +5,22 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel
-} from "@/components/ui/field"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card"
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
 import z from "zod"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
+import { useTransition } from "react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Loader } from "@hugeicons/core-free-icons"
 
 function SignupPage() {
+  const [isPending, startTransition] = useTransition()
+
+  const router = useRouter()
+
   const form = useForm({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -32,11 +30,22 @@ function SignupPage() {
     }
   })
 
-  async function onSubmit(data: z.infer<typeof signupSchema>) {
-    await authClient.signUp.email({
-      email: data.email,
-      name: data.name,
-      password: data.password
+  function onSubmit(data: z.infer<typeof signupSchema>) {
+    startTransition(async () => {
+      await authClient.signUp.email({
+        email: data.email,
+        name: data.name,
+        password: data.password,
+        fetchOptions: {
+          onSuccess: () => {
+            toast.success("Signed up  successfully!")
+            router.push('/')
+          },
+          onError: (error) => {
+            toast.error(error.error.message)
+          }
+        }
+      })
     })
   }
   return (
@@ -81,8 +90,15 @@ function SignupPage() {
             )} />
           </FieldGroup>
 
-          <Button type="submit" className="w-full mt-6">
-            Sign up
+          <Button type="submit" className="w-full mt-6" disabled={isPending}>
+            {isPending ? (
+              <>
+                <HugeiconsIcon icon={Loader} className="size-4 animate-spin" />
+                <span>Loading...</span>
+              </>
+            ) : (
+              <span>Sign up</span>
+            )}
           </Button>
         </form>
       </CardContent>
