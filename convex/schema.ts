@@ -5,7 +5,12 @@ export default defineSchema({
     posts: defineTable({
         title: v.string(),
         body: v.string(),
+        authorId: v.string()
+    }),
+    comments: defineTable({
+        postId: v.id('posts'),
         authorId: v.string(),
-        imageStorageId: v.optional(v.id('storage'))
+        authorName: v.string(),
+        body: v.string()
     })
 })

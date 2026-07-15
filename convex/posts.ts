@@ -3,23 +3,23 @@ import { ConvexError, v } from "convex/values";
 import { authComponent } from "./betterAuth/auth";
 
 // Create a new post with the given title and body
-export const createPost= mutation({
-    args: { 
+export const createPost = mutation({
+    args: {
         title: v.string(),
         body: v.string()
-     },
+    },
     handler: async (ctx, args) => {
         const user = await authComponent.safeGetAuthUser(ctx)
 
-        if(!user) {
+        if (!user) {
             throw new ConvexError('Not athenticated!')
         }
 
-        const blogArticle = await ctx.db.insert("posts", { 
+        const blogArticle = await ctx.db.insert("posts", {
             title: args.title,
             body: args.body,
             authorId: user._id
-         });
+        });
         return blogArticle;
     },
 });
@@ -29,5 +29,13 @@ export const getPosts = query({
     handler: async (ctx) => {
         const posts = await ctx.db.query('posts').order('desc').collect()
         return posts
+    }
+})
+
+export const getPostById = query({
+    args: { postId: v.id('posts') },
+    handler: async (ctx, args) => {
+        const post = await ctx.db.get(args.postId)
+        return post
     }
 })

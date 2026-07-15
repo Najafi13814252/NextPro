@@ -7,6 +7,7 @@ import { useConvexAuth } from "convex/react"
 import { authClient } from "@/lib/auth-client"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { Skeleton } from "../ui/skeleton"
 
 function Navbar() {
   const { isAuthenticated, isLoading } = useConvexAuth()
@@ -44,7 +45,7 @@ return (
 
     <div className="flex items-center gap-2">
 
-      {isLoading ? null : isAuthenticated ? (
+      {isLoading ? <Skeleton className="w-32 h-9"/> : isAuthenticated ? (
         <Button onClick={handleLogout}>Logout</Button>
       ) : (
         <>
