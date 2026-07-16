@@ -4,14 +4,36 @@ import { api } from "@/convex/_generated/api"
 import { Id } from "@/convex/_generated/dataModel"
 import { ArrowLeft } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { fetchQuery } from "convex/nextjs"
+import { fetchQuery, preloadQuery } from "convex/nextjs"
+import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
+
+export async function generateMetadata({ params }: { params: Promise<{ postId: Id<'posts'> }> }): Promise<Metadata> {
+    const { postId } = await params
+    const post = await fetchQuery(api.posts.getPostById, { postId: postId })
+
+    if (!post) {
+        return {
+            title: 'Post not found'
+        }
+    }
+
+    return {
+        title: post.title,
+        description: post.body
+    }
+}
 
 async function PostDetails({ params }: { params: Promise<{ postId: Id<'posts'> }> }) {
     const { postId } = await params
 
-    const post = await fetchQuery(api.posts.getPostById, { postId: postId })
+    const [post, preloadedComments] = await Promise.all([
+        await fetchQuery(api.posts.getPostById, { postId: postId }),
+        await preloadQuery(api.comments.getCommentsByPost, {
+            postId
+        })
+    ])
 
     if (!post) {
         return (
@@ -36,13 +58,13 @@ async function PostDetails({ params }: { params: Promise<{ postId: Id<'posts'> }
                 <p className="text-sm text-muted-foreground">Posted on: {new Date(post._creationTime).toLocaleDateString('en-us')}</p>
             </div>
 
-            <hr className="my-8"/>
+            <hr className="my-8" />
 
             <p className="text-lg leading-relaxed text-foreground/90 whitespace-pre-wrap">{post.body}</p>
 
-            <hr className="my-8"/>
+            <hr className="my-8" />
 
-            <CommentSection />
+            <CommentSection preloadedComments={preloadedComments} />
         </div>
     )
 }
